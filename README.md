@@ -4,4 +4,18 @@
 [![GitHub release](https://img.shields.io/github/release/linuxsuren/cgit.svg?label=release)](https://github.com/linuxsuren/cgit/releases/latest)
 ![GitHub All Releases](https://img.shields.io/github/downloads/linuxsuren/cgit/total)
 
-cgit is a tiny tool for Chinese developers.
+cgit is a wrapper of git.
+
+# Get started
+
+Clone a repo from GitHub without the whole URL: `cgit clone linuxsuren/cgit`
+
+Provide an alias for git: `cgit alias set cm 'checkout master'`, then you can checkout branch to master via: `cgit cm`
+
+List all alias commands: `cgit alias list`
+
+# Install
+
+```
+brew install linuxsuren/linuxsuren/cgit
+```
