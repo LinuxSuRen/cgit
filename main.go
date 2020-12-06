@@ -1,7 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	alias "github.com/linuxsuren/go-cli-alias/pkg"
+	aliasCmd "github.com/linuxsuren/go-cli-alias/pkg/cmd"
 	"github.com/spf13/cobra"
 	"os"
 	"os/exec"
@@ -26,7 +29,45 @@ func main()  {
 		},
 	}
 
-	cmd.Execute()
+	var ctx context.Context
+	if defMgr, err := alias.GetDefaultAliasMgrWithNameAndInitialData(cmd.Name(), []alias.Alias{
+		{Name: "cl", Command: "config list"},
+	}); err == nil {
+		ctx = context.WithValue(context.Background(), alias.AliasKey, defMgr)
+
+		cmd.AddCommand(aliasCmd.NewRootCommand(ctx))
+	} else {
+		cmd.Println(fmt.Errorf("cannot get default alias manager, error: %v", err))
+	}
+
+	cmd.SilenceErrors = true
+	a := cmd.Execute()
+	if a != nil && strings.Contains(a.Error(), "unknown command") {
+		args := os.Args[1:]
+		var ctx context.Context
+		var defMgr *alias.DefaultAliasManager
+		var err error
+		if defMgr, err = alias.GetDefaultAliasMgrWithNameAndInitialData(cmd.Name(), []alias.Alias{
+			{Name: "cl", Command: "config list"},
+		}); err == nil {
+			ctx = context.WithValue(context.Background(), alias.AliasKey, defMgr)
+			if ok, redirect := aliasCmd.RedirectToAlias(ctx, args); ok {
+				env := os.Environ()
+				var gitBinary string
+				if gitBinary, err = exec.LookPath("git"); err == nil {
+					syscall.Exec(gitBinary, append([]string{"git"}, redirect...), env)
+				}
+			} else {
+				env := os.Environ()
+				var gitBinary string
+				if gitBinary, err = exec.LookPath("git"); err == nil {
+					syscall.Exec(gitBinary, append([]string{"git"}, args...), env)
+				}
+			}
+		} else {
+			err = fmt.Errorf("cannot get default alias manager, error: %v", err)
+		}
+	}
 }
 
 func preferGitHub(args []string) {

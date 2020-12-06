@@ -49,7 +49,7 @@ brews:
     name: cgit
     tap:
       owner: linuxsuren
-      name: homebrew-cgit
+      name: homebrew-linuxsuren
     folder: Formula
     homepage: "https://github.com/linuxsuren/cgit"
     description: cgit is a tiny tool for Chinese developers.
