@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	extver "github.com/linuxsuren/cobra-extension/version"
 	alias "github.com/linuxsuren/go-cli-alias/pkg"
 	aliasCmd "github.com/linuxsuren/go-cli-alias/pkg/cmd"
 	"github.com/spf13/cobra"
@@ -12,7 +13,7 @@ import (
 	"syscall"
 )
 
-func main()  {
+func main() {
 	cmd := &cobra.Command{
 		Use: "cgit",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -28,6 +29,8 @@ func main()  {
 			return
 		},
 	}
+
+	cmd.AddCommand(extver.NewVersionCmd("linuxsuren", "cgit", "cgit", nil))
 
 	var ctx context.Context
 	if defMgr, err := alias.GetDefaultAliasMgrWithNameAndInitialData(cmd.Name(), []alias.Alias{
@@ -89,4 +92,3 @@ func useMirror(args []string) {
 		}
 	}
 }
-
