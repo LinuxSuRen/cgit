@@ -34,7 +34,7 @@ func main() {
 
 	var ctx context.Context
 	if defMgr, err := alias.GetDefaultAliasMgrWithNameAndInitialData(cmd.Name(), []alias.Alias{
-		{Name: "cl", Command: "config list"},
+		{Name: "cm", Command: "checkout master"},
 	}); err == nil {
 		ctx = context.WithValue(context.Background(), alias.AliasKey, defMgr)
 
@@ -51,22 +51,26 @@ func main() {
 		var defMgr *alias.DefaultAliasManager
 		var err error
 		if defMgr, err = alias.GetDefaultAliasMgrWithNameAndInitialData(cmd.Name(), []alias.Alias{
-			{Name: "cl", Command: "config list"},
+			{Name: "cm", Command: "checkout master"},
 		}); err == nil {
 			ctx = context.WithValue(context.Background(), alias.AliasKey, defMgr)
-			if ok, redirect := aliasCmd.RedirectToAlias(ctx, args); ok {
-				env := os.Environ()
-				var gitBinary string
-				if gitBinary, err = exec.LookPath("git"); err == nil {
-					syscall.Exec(gitBinary, append([]string{"git"}, redirect...), env)
-				}
-			} else {
-				env := os.Environ()
-				var gitBinary string
-				if gitBinary, err = exec.LookPath("git"); err == nil {
-					syscall.Exec(gitBinary, append([]string{"git"}, args...), env)
-				}
+			var gitBinary string
+			var targetCmd []string
+			env := os.Environ()
+
+			if gitBinary, err = exec.LookPath("git"); err != nil {
+				panic("cannot find git")
 			}
+
+			if ok, redirect := aliasCmd.RedirectToAlias(ctx, args); ok {
+				args = redirect
+			}
+
+			preferGitHub(args)
+			useMirror(args)
+
+			targetCmd = append([]string{"git"}, args...)
+			_ = syscall.Exec(gitBinary, targetCmd, env) // ignore the errors due to we've no power to deal with it
 		} else {
 			err = fmt.Errorf("cannot get default alias manager, error: %v", err)
 		}
