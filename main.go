@@ -1,10 +1,9 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	ext "github.com/linuxsuren/cobra-extension"
 	extver "github.com/linuxsuren/cobra-extension/version"
-	alias "github.com/linuxsuren/go-cli-alias/pkg"
 	aliasCmd "github.com/linuxsuren/go-cli-alias/pkg/cmd"
 	"github.com/spf13/cobra"
 	"os"
@@ -13,68 +12,39 @@ import (
 	"syscall"
 )
 
+const (
+	TargetCLI = "git"
+	AliasCLI  = "cgit"
+)
+
 func main() {
 	cmd := &cobra.Command{
-		Use: "cgit",
+		Use: AliasCLI,
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			env := os.Environ()
 
-			preferGitHub(args)
-			useMirror(args)
+			preHook(args)
 
 			var gitBinary string
-			if gitBinary, err = exec.LookPath("git"); err == nil {
-				syscall.Exec(gitBinary, append([]string{"git"}, args...), env)
+			if gitBinary, err = exec.LookPath(TargetCLI); err == nil {
+				syscall.Exec(gitBinary, append([]string{TargetCLI}, args...), env)
 			}
 			return
 		},
 	}
 
-	cmd.AddCommand(extver.NewVersionCmd("linuxsuren", "cgit", "cgit", nil))
+	cmd.AddCommand(extver.NewVersionCmd("linuxsuren", AliasCLI, AliasCLI, nil))
 
-	var ctx context.Context
-	if defMgr, err := alias.GetDefaultAliasMgrWithNameAndInitialData(cmd.Name(), []alias.Alias{
-		{Name: "cm", Command: "checkout master"},
-	}); err == nil {
-		ctx = context.WithValue(context.Background(), alias.AliasKey, defMgr)
+	aliasCmd.AddAliasCmd(cmd, getAliasList())
 
-		cmd.AddCommand(aliasCmd.NewRootCommand(ctx))
-	} else {
-		cmd.Println(fmt.Errorf("cannot get default alias manager, error: %v", err))
-	}
+	cmd.AddCommand(ext.NewCompletionCmd(cmd))
 
-	cmd.SilenceErrors = true
-	a := cmd.Execute()
-	if a != nil && strings.Contains(a.Error(), "unknown command") {
-		args := os.Args[1:]
-		var ctx context.Context
-		var defMgr *alias.DefaultAliasManager
-		var err error
-		if defMgr, err = alias.GetDefaultAliasMgrWithNameAndInitialData(cmd.Name(), []alias.Alias{
-			{Name: "cm", Command: "checkout master"},
-		}); err == nil {
-			ctx = context.WithValue(context.Background(), alias.AliasKey, defMgr)
-			var gitBinary string
-			var targetCmd []string
-			env := os.Environ()
+	aliasCmd.Execute(cmd, TargetCLI, getAliasList(), preHook)
+}
 
-			if gitBinary, err = exec.LookPath("git"); err != nil {
-				panic("cannot find git")
-			}
-
-			if ok, redirect := aliasCmd.RedirectToAlias(ctx, args); ok {
-				args = redirect
-			}
-
-			preferGitHub(args)
-			useMirror(args)
-
-			targetCmd = append([]string{"git"}, args...)
-			_ = syscall.Exec(gitBinary, targetCmd, env) // ignore the errors due to we've no power to deal with it
-		} else {
-			err = fmt.Errorf("cannot get default alias manager, error: %v", err)
-		}
-	}
+func preHook(args []string) {
+	preferGitHub(args)
+	useMirror(args)
 }
 
 func preferGitHub(args []string) {
@@ -83,7 +53,7 @@ func preferGitHub(args []string) {
 	}
 
 	address := args[1]
-	if !strings.HasPrefix(address, "http") {
+	if !strings.HasPrefix(address, "http") || !strings.HasPrefix(address, "git@") {
 		args[1] = fmt.Sprintf("https://github.com.cnpmjs.org/%s", address)
 	}
 }
