@@ -15,9 +15,9 @@ builds:
     post:
       - upx "{{ .Path }}"
   ldflags:
-    - -X github.com/linuxsuren/cgit/app.version={{.Version}}
-    - -X github.com/linuxsuren/cgit/app.commit={{.ShortCommit}}
-    - -X github.com/linuxsuren/cgit/app.date={{.Date}}
+    - -X github.com/linuxsuren/cobra-extension/version.version={{.Version}}
+    - -X github.com/linuxsuren/cobra-extension/version.commit={{.ShortCommit}}
+    - -X github.com/linuxsuren/cobra-extension/version.date={{.Date}}
     - -w
 dist: release
 archives:
