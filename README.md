@@ -10,6 +10,8 @@ cgit is a wrapper of git.
 
 Clone a repo from GitHub without the whole URL: `cgit clone linuxsuren/cgit`
 
+Sometimes it's very slow when clone the code from GitHub. So cgit will clone it by [a GitHub proxy](http://github.com.cnpmjs.org/).
+
 Provide an alias for git: `cgit alias set cm 'checkout master'`, then you can checkout branch to master via: `cgit cm`
 
 List all alias commands: `cgit alias list`
