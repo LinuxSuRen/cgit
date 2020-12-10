@@ -39,5 +39,7 @@ Sometimes it's very slow when clone the code from GitHub. So cgit will clone it 
 ## Alias
 
 Add a command alias: `cgit alias set cm 'checkout master'`
+
 Use an alias: `cgit cm`
+
 List all alias commands: `cgit alias list`
