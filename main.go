@@ -53,12 +53,16 @@ func preferGitHub(args []string) {
 	}
 
 	address := args[1]
-	if !strings.HasPrefix(address, "http") || !strings.HasPrefix(address, "git@") {
+	if !strings.HasPrefix(address, "http") && !strings.HasPrefix(address, "git@") {
 		args[1] = fmt.Sprintf("https://github.com.cnpmjs.org/%s", address)
 	}
 }
 
 func useMirror(args []string) {
+	// only for git clone
+	if len(args) < 2 || args[0] != "clone" {
+		return
+	}
 	for i, arg := range args {
 		if strings.Contains(arg, "github.com") && !strings.Contains(arg, "github.com.cnpmjs.org") {
 			args[i] = strings.ReplaceAll(arg, "github.com", "github.com.cnpmjs.org")
