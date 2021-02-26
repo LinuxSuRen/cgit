@@ -1,15 +1,16 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/linuxsuren/cgit/cmd"
+	"github.com/linuxsuren/cgit/pkg"
 	ext "github.com/linuxsuren/cobra-extension"
 	extver "github.com/linuxsuren/cobra-extension/version"
 	aliasCmd "github.com/linuxsuren/go-cli-alias/pkg/cmd"
 	"github.com/spf13/cobra"
-	"os"
 	"os/exec"
 	"strings"
-	"syscall"
 )
 
 const (
@@ -18,28 +19,30 @@ const (
 )
 
 func main() {
-	cmd := &cobra.Command{
+	command := &cobra.Command{
 		Use: AliasCLI,
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			env := os.Environ()
-
+		RunE: func(command *cobra.Command, args []string) (err error) {
+			fmt.Println(args, "sdfs")
 			preHook(args)
+
+			command.Println(args)
 
 			var gitBinary string
 			if gitBinary, err = exec.LookPath(TargetCLI); err == nil {
-				syscall.Exec(gitBinary, append([]string{TargetCLI}, args...), env)
+				err = pkg.ExecCommandInDir(gitBinary, "", args...)
 			}
 			return
 		},
 	}
 
-	cmd.AddCommand(extver.NewVersionCmd("linuxsuren", AliasCLI, AliasCLI, nil))
+	command.AddCommand(extver.NewVersionCmd("linuxsuren", AliasCLI, AliasCLI, nil))
 
-	aliasCmd.AddAliasCmd(cmd, getAliasList())
+	aliasCmd.AddAliasCmd(command, getAliasList())
 
-	cmd.AddCommand(ext.NewCompletionCmd(cmd))
+	command.AddCommand(ext.NewCompletionCmd(command),
+		cmd.NewMirrorCmd(context.TODO()))
 
-	aliasCmd.Execute(cmd, TargetCLI, getAliasList(), preHook)
+	aliasCmd.Execute(command, TargetCLI, getAliasList(), preHook)
 }
 
 func preHook(args []string) {
