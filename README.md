@@ -14,8 +14,20 @@ Provide an alias for git: `cgit alias set cm 'checkout master'`, then you can ch
 
 List all alias commands: `cgit alias list`
 
+## Mirror
+
+`cgit` can set a mirror address for you if it's very slow with fetching data from GitHub.
+
+Run this command `cgit mirror` in your local git repository directory, 
+it'll change the fetch address to `github.com.cnpmjs.org`. Reversing it is very easy, 
+just run command `cigt mirror --enable=false`.
+
 # Install
 
-```
-brew install linuxsuren/linuxsuren/cgit
-```
+You can install it via [brew](https://github.com/Homebrew/homebrew-core):
+
+`brew install linuxsuren/linuxsuren/cgit`
+
+Or, you can also install it via [hd](https://github.com/LinuxSuRen/http-downloader):
+
+`hd install -t 8 linuxsuren/cgit`
