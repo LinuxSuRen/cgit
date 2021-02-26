@@ -12,6 +12,14 @@ cgit is a wrapper of git.
 * GitHub proxy transparent support
 * Git command alias support 
 
+## Mirror
+
+`cgit` can set a mirror address for you if it's very slow with fetching data from GitHub.
+
+Run this command `cgit mirror` in your local git repository directory, 
+it'll change the fetch address to `github.com.cnpmjs.org`. Reversing it is very easy, 
+just run command `cigt mirror --enable=false`.
+
 # Install
 
 ```
@@ -43,3 +51,4 @@ Add a command alias: `cgit alias set cm 'checkout master'`
 Use an alias: `cgit cm`
 
 List all alias commands: `cgit alias list`
+
