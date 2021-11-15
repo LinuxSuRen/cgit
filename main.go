@@ -5,16 +5,21 @@ import (
 	"fmt"
 	"github.com/linuxsuren/cgit/cmd"
 	"github.com/linuxsuren/cgit/pkg"
-	ext "github.com/linuxsuren/cobra-extension"
+	ext "github.com/linuxsuren/cobra-extension/pkg"
 	extver "github.com/linuxsuren/cobra-extension/version"
 	aliasCmd "github.com/linuxsuren/go-cli-alias/pkg/cmd"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"os"
 	"os/exec"
+	"path"
 	"strings"
 )
 
 const (
+	// TargetCLI is the target command for alias
 	TargetCLI = "git"
+	// AliasCLI is the alias command
 	AliasCLI  = "cgit"
 )
 
@@ -22,7 +27,6 @@ func main() {
 	command := &cobra.Command{
 		Use: AliasCLI,
 		RunE: func(command *cobra.Command, args []string) (err error) {
-			fmt.Println(args, "sdfs")
 			preHook(args)
 
 			command.Println(args)
@@ -39,26 +43,33 @@ func main() {
 
 	aliasCmd.AddAliasCmd(command, getAliasList())
 
+	ctx := context.TODO()
 	command.AddCommand(ext.NewCompletionCmd(command),
-		cmd.NewMirrorCmd(context.TODO()))
+		cmd.NewMirrorCmd(ctx))
 
-	aliasCmd.Execute(command, TargetCLI, getAliasList(), preHook)
+	aliasCmd.ExecuteContextV2(command, context.TODO(), TargetCLI, getAliasList(), preHook)
 }
 
-func preHook(args []string) {
-	preferGitHub(args)
+func preHook(args []string) []string {
+	args = preferGitHub(args)
 	useMirror(args)
+	return args
 }
 
-func preferGitHub(args []string) {
+func preferGitHub(args []string) []string {
 	if len(args) <= 1 || args[0] != "clone" {
-		return
+		return args
 	}
 
 	address := args[1]
 	if !strings.HasPrefix(address, "http") && !strings.HasPrefix(address, "git@") {
 		args[1] = fmt.Sprintf("https://github.com.cnpmjs.org/%s", address)
+
+		if len(args) == 2 {
+			args = append(args, path.Join(viper.GetString("ws"), address))
+		}
 	}
+	return args
 }
 
 func useMirror(args []string) {
@@ -72,4 +83,22 @@ func useMirror(args []string) {
 			break
 		}
 	}
+}
+
+func init() {
+	viper.SetConfigName("cgit")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath("$HOME/.config")
+	viper.AddConfigPath(".")
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			panic(err)
+		}
+	}
+	loadDefaults()
+	return
+}
+
+func loadDefaults() {
+	viper.SetDefault("ws", os.ExpandEnv("$HOME/ws/github/"))
 }

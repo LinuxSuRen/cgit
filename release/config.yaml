@@ -1,0 +1,147 @@
+project_name: cgit
+release:
+  github:
+    owner: LinuxSuRen
+    name: cgit
+  name_template: '{{.Tag}}'
+milestones:
+- repo:
+    owner: LinuxSuRen
+    name: cgit
+  name_template: '{{ .Tag }}'
+brews:
+- name: cgit
+  tap:
+    owner: linuxsuren
+    name: homebrew-linuxsuren
+  commit_author:
+    name: goreleaserbot
+    email: goreleaser@carlosbecker.com
+  folder: Formula
+  install: |
+    bin.install name
+
+    prefix.install_metafiles
+  dependencies:
+  - name: vim
+    type: optional
+  - name: bash-completion
+    type: optional
+  test: |
+    version_output = shell_output("#{bin}/cgit version")
+    assert_match version.to_s, version_output
+  description: cgit is a tiny tool for Chinese developers.
+  homepage: https://github.com/linuxsuren/cgit
+  goarm: "6"
+scoop:
+  name: cgit
+  commit_author:
+    name: goreleaserbot
+    email: goreleaser@carlosbecker.com
+  commit_msg_template: Scoop update for {{ .ProjectName }} version {{ .Tag }}
+builds:
+- id: cgit
+  goos:
+  - windows
+  - linux
+  - darwin
+  goarch:
+  - amd64
+  - arm64
+  goarm:
+  - "6"
+  gomips:
+  - hardfloat
+  targets:
+  - windows_amd64
+  - linux_amd64
+  - linux_arm64
+  - darwin_amd64
+  - darwin_arm64
+  dir: .
+  main: .
+  ldflags:
+  - -X github.com/linuxsuren/cobra-extension/version.version={{.Version}}
+  - -X github.com/linuxsuren/cobra-extension/version.commit={{.ShortCommit}}
+  - -X github.com/linuxsuren/cobra-extension/version.date={{.Date}}
+  - -w
+  binary: cgit
+  hooks:
+    post:
+    - cmd: upx "{{ .Path }}"
+  env:
+  - CGO_ENABLED=0
+  lang: go
+  gobinary: go
+archives:
+- id: default
+  builds:
+  - cgit
+  name_template: '{{ .Binary }}-{{ .Os }}-{{ .Arch }}'
+  replacements:
+    amd64: amd64
+    arm64: arm64
+    darwin: darwin
+    linux: linux
+    windows: windows
+  format: tar.gz
+  format_overrides:
+  - goos: windows
+    format: zip
+  files:
+  - src: README.md
+  allow_different_binary_count: false
+nfpms:
+- file_name_template: '{{ .Binary }}-{{.Os}}-{{.Arch}}'
+  package_name: cgit
+  replacements:
+    amd64: 64bit
+    arm64: arm64
+    darwin: macOS
+    linux: linux
+    windows: windows
+  recommends:
+  - bash-completion
+  - vim
+  id: default
+  builds:
+  - cgit
+  formats:
+  - deb
+  - rpm
+  vendor: Jenkins
+  homepage: https://github.com/linuxsuren/cgit
+  maintainer: rick <rick@jenkins-zh.cn>
+  description: cgit is a tiny tool for Chinese developers.
+  license: MIT
+  bindir: /usr/bin
+snapshot:
+  name_template: '{{ .Tag }}-next-{{.ShortCommit}}'
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+changelog:
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+  sort: asc
+  skip: true
+dist: release
+env_files:
+  github_token: ~/.config/goreleaser/github_token
+  gitlab_token: ~/.config/goreleaser/gitlab_token
+  gitea_token: ~/.config/goreleaser/gitea_token
+source:
+  name_template: '{{ .ProjectName }}-{{ .Version }}'
+  format: tar.gz
+gomod:
+  gobinary: go
+announce:
+  twitter:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .GitURL
+      }}/releases/tag/{{ .Tag }}'
+github_urls:
+  download: https://github.com
+gitlab_urls:
+  download: https://gitlab.com
