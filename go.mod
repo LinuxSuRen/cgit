@@ -1,6 +1,6 @@
 module github.com/linuxsuren/cgit
 
-go 1.15
+go 1.16
 
 require (
 	github.com/linuxsuren/cobra-extension v0.0.11
