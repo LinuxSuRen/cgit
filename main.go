@@ -17,7 +17,9 @@ import (
 )
 
 const (
+	// TargetCLI is the target command for alias
 	TargetCLI = "git"
+	// AliasCLI is the alias command
 	AliasCLI  = "cgit"
 )
 
@@ -89,10 +91,7 @@ func init() {
 	viper.AddConfigPath("$HOME/.config")
 	viper.AddConfigPath(".")
 	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found; ignore error if desired
-			return
-		} else {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 			panic(err)
 		}
 	}
