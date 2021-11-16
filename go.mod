@@ -7,5 +7,5 @@ require (
 	github.com/linuxsuren/go-cli-alias v0.0.9
 	github.com/magiconair/properties v1.8.5
 	github.com/spf13/cobra v1.1.3
-	github.com/spf13/viper v1.7.0
+	github.com/spf13/viper v1.9.0
 )
