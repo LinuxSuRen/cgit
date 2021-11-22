@@ -20,7 +20,7 @@ const (
 	// TargetCLI is the target command for alias
 	TargetCLI = "git"
 	// AliasCLI is the alias command
-	AliasCLI  = "cgit"
+	AliasCLI = "cgit"
 )
 
 func main() {
@@ -51,18 +51,25 @@ func main() {
 }
 
 func preHook(args []string) []string {
-	args = preferGitHub(args)
+	args = parseShortCode(args)
 	useMirror(args)
 	return args
 }
 
-func preferGitHub(args []string) []string {
+func parseShortCode(args []string) []string {
 	if len(args) <= 1 || args[0] != "clone" {
 		return args
 	}
 
 	address := args[1]
-	if !strings.HasPrefix(address, "http") && !strings.HasPrefix(address, "git@") {
+	if strings.HasPrefix(address, "gitee.com") {
+		args[1] = fmt.Sprintf("https://%s", address)
+
+		if len(args) == 2 {
+			args = append(args, path.Join(strings.ReplaceAll(viper.GetString("ws"), "github", "gitee"),
+				strings.ReplaceAll(address, "gitee.com", "")))
+		}
+	} else if !strings.HasPrefix(address, "http") && !strings.HasPrefix(address, "git@") {
 		args[1] = fmt.Sprintf("https://github.com.cnpmjs.org/%s", address)
 
 		if len(args) == 2 {
