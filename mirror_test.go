@@ -22,6 +22,6 @@ func TestMirror(t *testing.T) {
 
 func TestPreferGitHub(t *testing.T) {
 	args := []string{"clone", "a/b"}
-	preferGitHub(args)
+	parseShortCode(args)
 	assert.Equal(t, args[1], "https://github.com.cnpmjs.org/a/b")
 }

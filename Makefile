@@ -7,6 +7,10 @@ BUILDFLAGS = -ldflags "-X github.com/linuxsuren/cobra-extension/version.version=
 build:
 	CGO_ENABLE=0 go build $(BUILDFLAGS) -o bin/cgit
 
+build-linux:
+	CGO_ENABLE=0 GOOS=linux go build $(BUILDFLAGS) -o bin/linux/cgit
+	upx bin/linux/cgit
+
 goreleaser:
 	goreleaser release --rm-dist --snapshot
 
