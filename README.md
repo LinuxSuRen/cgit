@@ -52,3 +52,6 @@ Use an alias: `cgit cm`
 
 List all alias commands: `cgit alias list`
 
+# Release
+
+This project can be released via [linuxsuren-versions](https://github.com/linuxsuren/linuxsuren-versions).
