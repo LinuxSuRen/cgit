@@ -69,6 +69,12 @@ func parseShortCode(args []string) []string {
 			args = append(args, path.Join(strings.ReplaceAll(viper.GetString("ws"), "github", "gitee"),
 				strings.ReplaceAll(address, "gitee.com", "")))
 		}
+	} else if strings.HasPrefix(address, "https://gitee.com/") {
+		if len(args) == 2 {
+			args = append(args, path.Join(strings.ReplaceAll(viper.GetString("ws"), "github", "gitee"),
+				strings.ReplaceAll(address, "https://gitee.com/", "")))
+		}
+
 	} else if !strings.HasPrefix(address, "http") && !strings.HasPrefix(address, "git@") {
 		args[1] = fmt.Sprintf("https://github.com.cnpmjs.org/%s", address)
 
