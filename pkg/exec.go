@@ -65,13 +65,9 @@ func ExecCommandInDir(name, dir string, args ...string) (err error) {
 	return
 }
 
-func execCommand(name string, arg ...string) (err error) {
-	return ExecCommandInDir(name, "", arg...)
-}
-
 func copyAndCapture(w io.Writer, r io.Reader) ([]byte, error) {
 	var out []byte
-	buf := make([]byte, 1024, 1024)
+	buf := make([]byte, 1024)
 	for {
 		n, err := r.Read(buf[:])
 		if n > 0 {

@@ -45,7 +45,8 @@ func main() {
 
 	ctx := context.TODO()
 	command.AddCommand(ext.NewCompletionCmd(command),
-		cmd.NewMirrorCmd(ctx))
+		cmd.NewMirrorCmd(ctx),
+		cmd.NewCloneCommand())
 
 	// do the dep checking
 	if err := installDepTools(); err != nil {
@@ -129,7 +130,6 @@ func init() {
 		}
 	}
 	loadDefaults()
-	return
 }
 
 func loadDefaults() {
