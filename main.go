@@ -8,11 +8,13 @@ import (
 	ext "github.com/linuxsuren/cobra-extension/pkg"
 	extver "github.com/linuxsuren/cobra-extension/version"
 	aliasCmd "github.com/linuxsuren/go-cli-alias/pkg/cmd"
+	"github.com/linuxsuren/http-downloader/pkg/installer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
 	"strings"
 )
 
@@ -28,8 +30,6 @@ func main() {
 		Use: AliasCLI,
 		RunE: func(command *cobra.Command, args []string) (err error) {
 			preHook(args)
-
-			command.Println(args)
 
 			var gitBinary string
 			if gitBinary, err = exec.LookPath(TargetCLI); err == nil {
@@ -47,7 +47,27 @@ func main() {
 	command.AddCommand(ext.NewCompletionCmd(command),
 		cmd.NewMirrorCmd(ctx))
 
+	// do the dep checking
+	if err := installDepTools(); err != nil {
+		panic(err)
+	}
+
 	aliasCmd.ExecuteContextV2(command, context.TODO(), TargetCLI, getAliasList(), preHook)
+}
+
+func installDepTools() (err error){
+	is := &installer.Installer{
+		Provider: "github",
+		OS:       runtime.GOOS,
+		Arch:     runtime.GOARCH,
+		Fetch:    true,
+	}
+	dep := map[string]string{
+		"git":        "git",
+	}
+
+	err = is.CheckDepAndInstall(dep)
+	return
 }
 
 func preHook(args []string) []string {
