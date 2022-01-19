@@ -11,7 +11,8 @@ import (
 )
 
 type cloneOption struct {
-	ws bool
+	ws       bool
+	protocol string
 }
 
 // NewCloneCommand returns the clone command
@@ -26,6 +27,7 @@ func NewCloneCommand() (cmd *cobra.Command) {
 
 	flags := cmd.Flags()
 	flags.BoolVarP(&opt.ws, "ws", "", false, "Clone the code into ~/ws/github/org/repo if it is true")
+	flags.StringVarP(&opt.protocol, "protocol", "p", "https", "The protocol, support: https, ssh, git")
 	return
 }
 
@@ -39,7 +41,7 @@ func (o *cloneOption) runE(_ *cobra.Command, args []string) (err error) {
 	if !o.ws {
 		output = nil
 	}
-	args = pkg.ParseShortCode(args, output)
+	args = pkg.ParseShortCodeWithProtocol(args, o.protocol, output)
 
 	var targetDir string
 	gitAddress := args[0]
@@ -69,6 +71,9 @@ func (o *cloneOption) runE(_ *cobra.Command, args []string) (err error) {
 		if err = survey.AskOne(prompt, &ok); err == nil && ok {
 			err = pkg.ExecCommandInDir(ghBinary, targetDir, "repo", "fork", "--remote")
 		}
+	} else {
+		// it's ok if no gh found
+		err = nil
 	}
 	return
 }
