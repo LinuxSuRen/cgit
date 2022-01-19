@@ -69,6 +69,9 @@ func (o *cloneOption) runE(_ *cobra.Command, args []string) (err error) {
 		if err = survey.AskOne(prompt, &ok); err == nil && ok {
 			err = pkg.ExecCommandInDir(ghBinary, targetDir, "repo", "fork", "--remote")
 		}
+	} else {
+		// it's ok if no gh found
+		err = nil
 	}
 	return
 }
