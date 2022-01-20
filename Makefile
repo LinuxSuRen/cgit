@@ -16,3 +16,8 @@ goreleaser:
 
 copy: build
 	sudo cp bin/cgit /usr/local/bin/cgit
+
+# Install golang-lint via https://golangci-lint.run/usage/install/#local-installation
+# or via 'hd install golangci-lint'
+lint:
+	golangci-lint run ./...
