@@ -9,5 +9,5 @@ require (
 	github.com/linuxsuren/http-downloader v0.0.55
 	github.com/magiconair/properties v1.8.5
 	github.com/spf13/cobra v1.3.0
-	github.com/spf13/viper v1.10.0
+	github.com/spf13/viper v1.10.1
 )
