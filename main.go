@@ -97,7 +97,7 @@ func parseShortCode(args []string) []string {
 		}
 
 	} else if !strings.HasPrefix(address, "http") && !strings.HasPrefix(address, "git@") {
-		args[1] = fmt.Sprintf("https://github.com.cnpmjs.org/%s", address)
+		args[1] = fmt.Sprintf("https://ghproxy.com/%s", address)
 
 		if len(args) == 2 {
 			args = append(args, path.Join(viper.GetString("ws"), address))
@@ -112,8 +112,8 @@ func useMirror(args []string) {
 		return
 	}
 	for i, arg := range args {
-		if strings.Contains(arg, "github.com") && !strings.Contains(arg, "github.com.cnpmjs.org") {
-			args[i] = strings.ReplaceAll(arg, "github.com", "github.com.cnpmjs.org")
+		if strings.Contains(arg, "github.com") && !strings.Contains(arg, "ghproxy.com") {
+			args[i] = strings.ReplaceAll(arg, "github.com", "ghproxy.com")
 			break
 		}
 	}
